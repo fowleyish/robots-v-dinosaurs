@@ -6,7 +6,10 @@ namespace RobotsVSDinosaurs
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Welcome!");
+            Battlefield Battle = new Battlefield();
+            Battle.getStatus();
+            Battle.controlBattle();
         }
     }
 }

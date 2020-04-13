@@ -8,7 +8,7 @@ namespace RobotsVSDinosaurs
     {
 
         public string Name;
-        public object Job;
+        public Job Job;
         public int Hp;
         public int Mp;
         public int Intelligence;
@@ -16,7 +16,7 @@ namespace RobotsVSDinosaurs
         public Dinosaur(string name, string job)
         {
             Name = name;
-            Job = setJob(job);
+            Job = new Job(job);
             Hp = getHp();
             Mp = getMp();
             Intelligence = getIntelligence();
@@ -24,40 +24,26 @@ namespace RobotsVSDinosaurs
 
         public int getHp()
         {
-            int baseHp = 100;
+            int baseHp = 80;
             Random random = new Random();
-            int variance = random.Next(1, 20);
+            int variance = random.Next(1, 30);
             return baseHp + variance;
         }
 
         public int getMp()
         {
-            int baseMp = 5;
+            int baseMp = 30;
             Random random = new Random();
-            int variance = random.Next(1, 3);
+            int variance = random.Next(1, 6);
             return baseMp + variance;
         }
 
         public int getIntelligence()
         {
-            int baseInt = 10;
+            int baseInt = 26;
             Random random = new Random();
             int variance = random.Next(1, 5);
             return baseInt + variance;
-        }
-
-        public object setJob(string jobChoice)
-        {
-            if (jobChoice == "wizard")
-            {
-                Wizard wizard = new Wizard();
-                return wizard;
-            }
-            else
-            {
-                Healer healer = new Healer();
-                return healer;
-            }
         }
     }
 }

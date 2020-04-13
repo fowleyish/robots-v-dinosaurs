@@ -8,21 +8,23 @@ namespace RobotsVSDinosaurs
     {
 
         public string Name;
-        public object Weapon;
+        public Weapon Weapon;
         public int Hp;
         public int Strength;
+        public bool Defending;
 
         public Robot(string name, string weapon)
         {
             Name = name;
-            Weapon = setWeapon(weapon);
+            Weapon = new Weapon(weapon);
             Hp = getHp();
             Strength = getStrength();
+            Defending = false;
         }
 
         public int getHp()
         {
-            int baseHp = 160;
+            int baseHp = 120;
             Random random = new Random();
             int variance = random.Next(1, 40);
             return baseHp + variance;
@@ -35,25 +37,5 @@ namespace RobotsVSDinosaurs
             int variance = random.Next(1, 7);
             return baseInt + variance;
         }
-
-        public object setWeapon(string weaponChoice)
-        {
-            if (weaponChoice == "sword")
-            {
-                Sword sword = new Sword();
-                return sword;
-            }
-            else
-            {
-                MachineGun gun = new MachineGun();
-                return gun;
-            }
-        }
-
-        public void attack()
-        {
-
-        }
-
     }
 }
