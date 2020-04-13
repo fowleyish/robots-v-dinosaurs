@@ -6,5 +6,6 @@ namespace RobotsVSDinosaurs
 {
     class Fleet
     {
+        List<object> RoboBots = new List<object>();
     }
 }
