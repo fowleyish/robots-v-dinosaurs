@@ -57,7 +57,19 @@ namespace RobotsVSDinosaurs
             Console.Write("Which dinosaur will {0} attack? ", robot.Name);
             foreach ( Dinosaur dino in Herd.Dinosaurs) { Console.Write($"{dino.Name} "); }
             string dinoName = Console.ReadLine();
-            foreach (Dinosaur dino in Herd.Dinosaurs) { if (dinoName == dino.Name) { executeRoboCommand(robot, command, dino); } }
+            Dinosaur dinosaur = null;
+            foreach (Dinosaur dino in Herd.Dinosaurs) 
+            { 
+                if (dinoName == dino.Name) 
+                {
+                    dinosaur = dino;
+                    break;
+                } 
+            }
+            while(dinosaur.Hp > 0)
+            {
+                executeRoboCommand(robot, command, dinosaur);
+            }
         }
 
         public void executeRoboCommand(Robot robot, string command, Dinosaur dino)
@@ -97,7 +109,7 @@ namespace RobotsVSDinosaurs
         {
             if (thisDino.Job.JobName.ToLower() == "wizard")
             {
-                Console.Write("Will {0} use FIREBALL or LIGHTNING BOLT? ", thisDino.Name);
+                Console.Write("Will {0} use FIREBALL or LIGHTNING BOLT for MP, or ATTACK an enemy? ", thisDino.Name);
                 string command = Console.ReadLine().ToLower();
                 chooseRoboOrDinoTarget(thisDino, command);
             }
@@ -116,14 +128,40 @@ namespace RobotsVSDinosaurs
                 Console.Write("Which robot will {0} use {1} on? ", dino.Name, command);
                 foreach (Robot robo in Fleet.Robots) { Console.Write($"{robo.Name} "); }
                 string roboName = Console.ReadLine();
-                foreach (Robot robo in Fleet.Robots) { if (roboName == robo.Name) { executeDinoCommand(dino, command, robo, null); } }
+                Robot robot = null;
+                foreach (Robot robo in Fleet.Robots)
+                {
+                    if (roboName == robo.Name)
+                    {
+                        robot = robo;
+                        break;
+                    }
+                }
+                while (robot.Hp > 0)
+                {
+                    executeDinoCommand(dino, command, robot, null);
+                }
             }
             else
             {
                 Console.Write("Which dinosaur will {0} heal? ", dino.Name);
                 foreach (Dinosaur thisDino in Herd.Dinosaurs) { Console.Write($"{thisDino.Name} ");  }
                 string dinoName = Console.ReadLine();
-                foreach (Dinosaur targetDino in Herd.Dinosaurs) { if (dinoName == targetDino.Name) { executeDinoCommand(dino, command, null, targetDino); } }
+                Dinosaur dinosaur = null;
+                int runs = 1;
+                foreach (Dinosaur d in Herd.Dinosaurs)
+                {
+                    if (dinoName == d.Name)
+                    {
+                        dinosaur = d;
+                        break;
+                    }
+                }
+                while (dinosaur.Hp > 0 && runs == 1)
+                {
+                    executeDinoCommand(dino, command, null, dinosaur);
+                    runs++;
+                }
             }
         }
 
@@ -141,8 +179,8 @@ namespace RobotsVSDinosaurs
                 }
                 else
                 {
+                    Console.WriteLine("{0} died! {1}'s MP is now {2}", targetRobo.Name, dino.Name, dino.Mp);
                     Fleet.Robots.Remove(targetRobo);
-                    Console.WriteLine("{0} died! {1}'s MP is now {4}", targetRobo.Name, dino.Name, dino.Mp);
                 }
             }
             else if (command == "lightning bolt" && dino.Mp >= dino.Job.BoltCost)
@@ -157,16 +195,9 @@ namespace RobotsVSDinosaurs
                 }
                 else
                 {
+                    Console.WriteLine("{0} died! {1}'s MP is now {2}", targetRobo.Name, dino.Name, dino.Mp);
                     Fleet.Robots.Remove(targetRobo);
-                    Console.WriteLine("{0} died! {1}'s MP is now {4}", targetRobo.Name, dino.Name, dino.Mp);
                 }
-            }
-            else if (command == "heal" && dino.Mp >= dino.Job.HealCost)
-            {
-                int health = (dino.Intelligence + dino.Job.HealStrength) / 2;
-                targetDino.Hp += health;
-                dino.Mp -= dino.Job.HealCost;
-                Console.WriteLine("{0} healed by {1} HP! {0}'s HP is now {2} and {3}'s MP is now {4}", targetDino.Name, health, targetDino.Hp, dino.Name, dino.Mp);
             }
             else if (command == "attack")
             {
@@ -183,6 +214,13 @@ namespace RobotsVSDinosaurs
                     Console.WriteLine("{0} died!", targetRobo.Name);
                 }
             }
+            else if (command == "heal" && dino.Mp >= dino.Job.HealCost)
+            {
+                int health = (dino.Intelligence + dino.Job.HealStrength) / 2;
+                targetDino.Hp += health;
+                dino.Mp -= dino.Job.HealCost;
+                Console.WriteLine("{0} healed by {1} HP! {0}'s HP is now {2} and {3}'s MP is now {4}", targetDino.Name, health, targetDino.Hp, dino.Name, dino.Mp);
+            }
         }
 
         public void controlBattle()
@@ -191,13 +229,51 @@ namespace RobotsVSDinosaurs
             int survivingDinosaurs = Herd.Dinosaurs.Count;
             while (survivingRobots > 0 || survivingDinosaurs > 0)
             {
-                RoundCount += 1;
-                Console.WriteLine($"Round {RoundCount}:");
-                roboRound();
-                dinoRound();
-                Console.WriteLine($"Round {RoundCount} complete! Here is are the current teams' standings: ");
-
+                if (survivingRobots <= 0 || survivingDinosaurs <= 0)
+                {
+                    break;
+                }
+                else
+                {
+                    RoundCount += 1;
+                    Console.WriteLine($"Round {RoundCount}");
+                    Console.WriteLine("=================================");
+                    roboRound();
+                    LineBreak(1);
+                    dinoRound();
+                    LineBreak(1);
+                    Console.WriteLine($"Round {RoundCount} complete! Here are the current teams' standings: ");
+                    getStatus();
+                    LineBreak(4);
+                }
             }
+            declareWinner();
+        }
+
+        public void LineBreak(int num)
+        {
+            for (int i = 0; i < num + 1; i++)
+            {
+                Console.WriteLine();
+            }
+        }
+
+        public void declareWinner()
+        {
+            if ( Fleet.Robots.Count <= 0 ) {
+                Console.WriteLine("Dinosaurs win!");
+                Console.WriteLine("Final scores: ");
+                getStatus();
+            }
+            else
+            {
+                Console.WriteLine("Robots win!");
+                Console.WriteLine("Final scores: ");
+                getStatus();
+            }
+            Console.WriteLine("Press Enter to close the application");
+            Console.ReadLine();
+            Environment.Exit(0);
         }
     }
 }

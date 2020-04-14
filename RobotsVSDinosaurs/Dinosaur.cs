@@ -24,7 +24,7 @@ namespace RobotsVSDinosaurs
 
         public int getHp()
         {
-            int baseHp = 80;
+            int baseHp = 1;
             Random random = new Random();
             int variance = random.Next(1, 30);
             return baseHp + variance;
